@@ -3,40 +3,34 @@
 #include <string.h>
 #include <math.h>
 
-#define TRUE 1;
-#define FALSE 0;
 
-int Print_Border(char Symbol, int NumSymbols);
+int isprime(long k);
 
 int main(void)
 {
-    int check_flag, msg_length;
-    /* Prefix 'const' indicates that this should not be chnaged
-    in the program. */
-    const char* message = "Welcome to Scientific Computing 2020/21";
-
-    /* Find out how many characters are in the string */
-    msg_length = strlen(message);
-    /* Print a border */
-    check_flag = Print_Border('*', msg_length + 4);
-    /* Print the message */
-    printf("\n* %s *\n", message);
-    /* Print another border */
-    check_flag = Print_Border('*', msg_length + 4);
-    printf("\n");
-
+    for (int k = 1; k <= 20; k++)
+    {
+        printf("%d %d\n", k, isprime(k));
+    }
     return(0);
 }
 
-int Print_Border(char Symbol, int NumSymbols)
+int isprime(long k)
 {
-    int i;
-    /* Print 'NumSymbols' times a character 'Symbol' */
-    for(i = 0; i < NumSymbols; i++)
+    long int i;
+    if (k == 1 || k == 2)
     {
-     	/* Note the format for a charcter: '%c' */
-        printf("%c", Symbol);
+        return(1);
     }
-
-    return(i);
+    else
+    {
+        for (i = 2; i < k; i++)
+        {
+            if (k % i == 0)
+            {
+                return(0);
+            }
+        }
+        return(1);
+    }
 }
