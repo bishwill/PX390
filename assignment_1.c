@@ -16,7 +16,7 @@ int main(void)
 }
 
 /*
-A fumction to check whether a given number is prime or not
+A function to check whether a given number is prime or not
 */
 int isprime(long k)
 {
