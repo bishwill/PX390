@@ -15,6 +15,9 @@ int main(void)
     return(0);
 }
 
+/*
+A fumction to check whether a given number is prime or not
+*/
 int isprime(long k)
 {
     long int i;
