@@ -6,13 +6,11 @@
 
 int isprime(long k);
 void happy_meter(int size);
+int num_conseq_digits(long k);
 
 int main(void)
 {
-    happy_meter(0);
-    happy_meter(1);
-    happy_meter(5);
-    happy_meter(10);
+    num_conseq_digits(10);
 }
 
 /*
@@ -37,6 +35,9 @@ int isprime(long k)
     }
 }
 
+/*
+A function to print smiley faces :-)
+*/
 void happy_meter(int size)
 {
     printf("%s", "I am happy about this assignment ");
@@ -45,4 +46,34 @@ void happy_meter(int size)
         printf("%s", ":-) ");
     }
     printf("\n");
+}
+
+
+int num_conseq_digits(long k)
+{
+    int numIter = log10(k) + 1;
+    long x = k;
+    int lastNum = -1;
+    int count = 1;
+    int tempCount = 1;
+    for (int i = 0; i < numIter; i++)
+    {
+        int currentNum = x % 10;
+        if (currentNum == lastNum)
+        {
+            tempCount += 1;
+        }
+        else
+        {
+            if (tempCount > count)
+            {
+                count = tempCount;
+            }
+            tempCount = 1;
+            lastNum = currentNum;
+        }
+        x /= 10;
+    }
+    printf("%d", count);
+    return(count);
 }
