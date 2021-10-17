@@ -5,7 +5,7 @@
 
 int main(void)
 {
-    long a, b;
+    long int a, b;
     scanf("%ld %ld", &a, &b);
     printf("%ld\n", labs(a-b));
 }
