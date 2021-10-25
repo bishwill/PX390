@@ -10,7 +10,7 @@ int num_conseq_digits(long k);
 
 int main(void)
 {
-    num_conseq_digits(10);
+    return(0);
 }
 
 /*
@@ -18,7 +18,11 @@ A function to check whether a given number is prime or not
 */
 int isprime(long k)
 {
-    if (k == 1 || k == 2)
+    if (k == 1)
+    {
+        return(0);
+    }
+    if (k == 2)
     {
         return(1);
     }
@@ -40,7 +44,7 @@ A function to print smiley faces :-)
 */
 void happy_meter(int size)
 {
-    printf("%s", "I am happy about this assignment ");
+    printf("I am happy about this assignment ");
     for (int i = 0; i < size; i++)
     {
         printf("%s", ":-) ");
@@ -74,6 +78,9 @@ int num_conseq_digits(long k)
         }
         x /= 10;
     }
-    printf("%d", count);
+    if (tempCount > count)
+    {
+        count = tempCount;
+    }
     return(count);
 }
