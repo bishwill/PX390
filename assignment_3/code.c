@@ -107,7 +107,7 @@ int main(void) {
   int k;
   double x;
   /* Current time */
-  double ctime;
+  double ctime = 0.0;
 
   /* Initialise arrays */
   for(k = 0; k <= nx; k++) {
