@@ -37,6 +37,12 @@
                #include <math.h> to the program so cos()
                is defined.
 
+    96-97      Within the if statement, the expressions
+               used = instead of ==. This is an
+               assignment rather than a logical
+               expression so it should not be used in an
+               if statement. Changing each = to a == will
+               fix the issue.
 
 *--------+-------------------------------------------
 * Example (not a real error):
@@ -92,8 +98,8 @@ int main(void) {
   vts2 = malloc(nx);
 
   /* Check the allocation pointers */
-  if (uc=NULL||un=NULL||vc=NULL||vn=NULL||uts1=NULL||
-  uts2=NULL||vts1=NULL||vts2=NULL) {
+  if (uc==NULL||un==NULL||vc==NULL||vn==NULL||uts1==NULL||
+  uts2==NULL||vts1==NULL||vts2==NULL) {
     printf("Memory allocation failed\n");
     return 1;
   }
