@@ -21,7 +21,7 @@
                function must always return an output
                of type int
 
-    
+    51         Don't know what to put here
 
 *--------+-------------------------------------------
 * Example (not a real error):
