@@ -44,6 +44,13 @@
                if statement. Changing each = to a == will
                fix the issue.
 
+    110        ctime was declared but it was not given
+               an initial value. Therefore when it was
+               incremented further in the program, it
+               did not have a value to increment. To fix
+               it, I set the value to be 0.0 when
+               the variable is declared.
+
 *--------+-------------------------------------------
 * Example (not a real error):
 *  21 ...... Removed space between(void) and {
