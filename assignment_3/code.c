@@ -15,6 +15,14 @@
 *--------+--------------------------------------------
 *  Line  |     Brief description of a fix
 * Number |
+
+    32         Changed the output of the main function
+               from double to int because the main
+               function must always return an output
+               of type int
+
+    
+
 *--------+-------------------------------------------
 * Example (not a real error):
 *  21 ...... Removed space between(void) and {
@@ -26,7 +34,7 @@
 
 void read_input(double *D, double *L, int *nx, double *t_F);
 
-double main(void) {
+int main(void) {
   /******************************/
   /* Declarations of parameters */
   /******************************/
