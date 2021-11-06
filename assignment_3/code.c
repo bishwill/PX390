@@ -23,12 +23,28 @@
 
     51         Don't know what to put here
 
+    98         Function sin() was called but it hasn't
+               been defined due to the fact that the
+               math library has not been included. To
+               fix, I have added the line
+               #include <math.h> to the program so sin()
+               is defined.
+
+    109        Function cos() was called but it hasn't
+               been defined due to the fact that the
+               math library has not been included. To
+               fix, I have added the line
+               #include <math.h> to the program so cos()
+               is defined.
+
+
 *--------+-------------------------------------------
 * Example (not a real error):
 *  21 ...... Removed space between(void) and {
 ********************************************************/
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #define PI  3.141592
 
