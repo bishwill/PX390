@@ -48,7 +48,7 @@ int main(void) {
   double t_F;
 
   /* Read in from file; */
-  read_input(D, L, nx, t_F);
+  read_input(&D, &L, &nx, &t_F);
 
   /* Grid spacing */
   double dx = L/nx;
