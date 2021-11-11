@@ -51,6 +51,23 @@
                it, I set the value to be 0.0 when
                the variable is declared.
 
+    115-122    malloc(nx) --> malloc(sizeof(double) * nx)       
+
+    137, 154, 172  for loop changed to interior points [1, nx-1] 
+
+    158, 160 175, 177   Changed + D to - D 
+
+    168        Formula was incorrect for rotation matrix
+
+    182-183    Changed from vts1 and vts2 to vn and vc respectively
+
+
+    197-199    Removed the & when freeing memory as it is
+               not required.
+
+
+    199        Removed free(vts1) and free(vts2)
+               
 *--------+-------------------------------------------
 * Example (not a real error):
 *  21 ...... Removed space between(void) and {
@@ -95,14 +112,14 @@ int main(void) {
   double deriv;
 
   /* Allocate memory according to size of nx */
-  uc = malloc(nx);
-  un = malloc(nx);
-  vc = malloc(nx);
-  vn = malloc(nx);
-  uts1 = malloc(nx);
-  uts2 = malloc(nx);
-  vts1 = malloc(nx);
-  vts2 = malloc(nx);
+  uc = (double *)malloc(sizeof(double) * nx);
+  un = (double *)malloc(sizeof(double) * nx);
+  vc = (double *)malloc(sizeof(double) * nx);
+  vn = (double *)malloc(sizeof(double) * nx);
+  uts1 = (double *)malloc(sizeof(double) * nx);
+  uts2 = (double *)malloc(sizeof(double) * nx);
+  vts1 = (double *)malloc(sizeof(double) * nx);
+  vts2 = (double *)malloc(sizeof(double) * nx);
 
   /* Check the allocation pointers */
   if (uc==NULL||un==NULL||vc==NULL||vn==NULL||uts1==NULL||
@@ -117,7 +134,7 @@ int main(void) {
   double ctime = 0.0;
 
   /* Initialise arrays */
-  for(k = 0; k <= nx; k++) {
+  for(k = 0; k < nx; k++) {
     x = k*dx;
     uc[k]  = 1.0 + sin(2.0*PI*x/L);
     vc[k]  = 0.0;
@@ -134,13 +151,13 @@ int main(void) {
     double sfac = sin(2*dt);
     
     /* First substep for diffusion equation, A_1 */ 
-    for (k = 0; k < nx; k++) {
+    for (k = 1; k < nx-1; k++) {
       x = k*dx;
       /* Diffusion at half time step. */
       deriv = (uc[k-1] + uc[k+1] - 2*uc[k])*invdx2;
-      uts1[k] = uc[k] + D * deriv * 0.5*dt;
+      uts1[k] = uc[k] - D * deriv * 0.5*dt;
       deriv = (vc[k-1] + vc[k+1] - 2*vc[k])*invdx2;
-      vts1[k] = vc[k] + D * deriv * 0.5*dt;
+      vts1[k] = vc[k] - D * deriv * 0.5*dt;
     }
 
     /* Second substep for decay/growth terms, A_2 */
@@ -148,22 +165,22 @@ int main(void) {
       x = k*dx;
       /* Apply rotation matrix to u and v, */
       uts2[k] = cfac*uts1[k] + sfac*vts1[k];
-      vts2[k] = sfac*uts1[k] + cfac*vts1[k];
+      vts2[k] = -sfac*uts1[k] + cfac*vts1[k];
     }
 
     /* Thirs substep for diffusion terms, A_1 */
-    for (k = 0; k < nx; k++) {
+    for (k = 1; k < nx-1; k++) {
       x = k*dx;
       deriv = (uts2[k-1] + uts2[k+1] - 2*uts2[k])*invdx2;
-      un[k] = uts2[k] + D * deriv * 0.5*dt;
+      un[k] = uts2[k] - D * deriv * 0.5*dt;
       deriv = (vts2[k-1] + vts2[k+1] - 2*vts2[k])*invdx2;
-      vn[k] = vts2[k] + D * deriv * 0.5*dt;
+      vn[k] = vts2[k] - D * deriv * 0.5*dt;
     }
-	   
+
     /* Copy next values at timestep to u, v arrays. */
     double *tmp;
-    tmp = vts1;
-    vn = vts2; 
+    tmp = vn;
+    vn = vc; 
     vc = tmp;
     tmp = un;
     un = uc; 
@@ -177,11 +194,9 @@ int main(void) {
     }
   }
   /* Free allocated memory */
-  free(&uc); free(&un);
-  free(&vc); free(&vn);
-  free(&uts1); free(&uts2);
-  free(&vts1); free(&vts2);
-
+  free(uc); free(un);
+  free(vc); free(vn);
+  free(uts1); free(uts2);
   return 0;
 }
 
