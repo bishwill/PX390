@@ -128,11 +128,11 @@ int main(void) {
 
   /* Loop over timesteps */ 
   while (ctime < t_F){
-  
+    
     /* Rotation factors for time-splitting scheme. */
     double cfac = cos(2*dt);
     double sfac = sin(2*dt);
-
+    
     /* First substep for diffusion equation, A_1 */ 
     for (k = 0; k < nx; k++) {
       x = k*dx;
