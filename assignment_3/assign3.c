@@ -55,6 +55,8 @@
 
     137, 154, 172  for loop changed to interior points [1, nx-1] 
 
+    152-153    Changed 2*dt to dt.
+
     158, 160 175, 177   Changed + D to - D 
 
     168        Formula was incorrect for rotation matrix
@@ -97,7 +99,7 @@ int main(void) {
   read_input(&D, &L, &nx, &t_F);
 
   /* Grid spacing */
-  double dx = L/nx;
+  double dx = L/(nx-1);
   double invdx2 = 1.0/(dx*dx);      
   /* Time step */
   double dt = 0.5;
@@ -147,8 +149,8 @@ int main(void) {
   while (ctime < t_F){
     
     /* Rotation factors for time-splitting scheme. */
-    double cfac = cos(2*dt);
-    double sfac = sin(2*dt);
+    double cfac = cos(dt);
+    double sfac = sin(dt);
     
     /* First substep for diffusion equation, A_1 */ 
     for (k = 1; k < nx-1; k++) {
