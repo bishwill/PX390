@@ -141,9 +141,17 @@ int main(void) {
     uc[k]  = 1.0 + sin(2.0*PI*x/L);
     vc[k]  = 0.0;
     /* Set other arrays to 0 */
+    un[k] = 0;
+    vn[k] = 0;
     uts1[k] = 0; uts2[k] = 0;
     vts1[k] = 0; vts2[k] = 0;
   }
+
+  /* Print Initial Values */
+  for (k = 0; k < nx; k++ ) {
+    x = k*dx;
+    printf("%g %g %g %g\n",ctime,x,uc[k],vc[k]);
+    }
 
   /* Loop over timesteps */ 
   while (ctime < t_F){
@@ -189,14 +197,15 @@ int main(void) {
     ctime += dt;
     for (k = 0; k < nx; k++ ) {
       x = k*dx;
-      //printf("%g %g %g %g\n",ctime,x,uc[k],vc[k]);
-      printf("(%g, %g)\n",x,vc[k]);
+      printf("%g %g %g %g\n",ctime,x,uc[k],vc[k]);
     }
   }
   /* Free allocated memory */
   free(uc); free(un);
   free(vc); free(vn);
   free(uts1); free(uts2);
+  free(vts1); free(vts2);
+
   return 0;
 }
 
