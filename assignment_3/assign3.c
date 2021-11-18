@@ -157,13 +157,13 @@ int main(void) {
       x = k*dx;
       /* Diffusion at half time step. */
       deriv = (uc[k-1] + uc[k+1] - 2*uc[k])*invdx2;
-      uts1[k] = uc[k] - D * deriv * 0.5*dt;
+      uts1[k] = uc[k] + D * deriv * 0.5*dt;
       deriv = (vc[k-1] + vc[k+1] - 2*vc[k])*invdx2;
-      vts1[k] = vc[k] - D * deriv * 0.5*dt;
+      vts1[k] = vc[k] + D * deriv * 0.5*dt;
     }
 
     /* Second substep for decay/growth terms, A_2 */
-    for (k = 0; k < nx; k++) {
+    for (k = 1; k < nx-1; k++) {
       x = k*dx;
       /* Apply rotation matrix to u and v, */
       uts2[k] = cfac*uts1[k] + sfac*vts1[k];
@@ -174,25 +174,23 @@ int main(void) {
     for (k = 1; k < nx-1; k++) {
       x = k*dx;
       deriv = (uts2[k-1] + uts2[k+1] - 2*uts2[k])*invdx2;
-      un[k] = uts2[k] - D * deriv * 0.5*dt;
+      un[k] = uts2[k] + D * deriv * 0.5*dt;
       deriv = (vts2[k-1] + vts2[k+1] - 2*vts2[k])*invdx2;
-      vn[k] = vts2[k] - D * deriv * 0.5*dt;
+      vn[k] = vts2[k] + D * deriv * 0.5*dt;
     }
 
     /* Copy next values at timestep to u, v arrays. */
-    double *tmp;
-    tmp = vn;
-    vn = vc; 
-    vc = tmp;
-    tmp = un;
-    un = uc; 
-    uc = tmp;
+    for (k = 1; k < nx-1; k++) {
+      uc[k] = un[k];
+      vc[k] = vn[k];
+    }
 
     /* Increment time. */   
     ctime += dt;
     for (k = 0; k < nx; k++ ) {
       x = k*dx;
-      printf("%g %g %g %g\n",ctime,x,uc[k],vc[k]);
+      //printf("%g %g %g %g\n",ctime,x,uc[k],vc[k]);
+      printf("(%g, %g)\n",x,vc[k]);
     }
   }
   /* Free allocated memory */
