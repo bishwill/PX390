@@ -103,6 +103,7 @@ int main(void) {
   double invdx2 = 1.0/(dx*dx);      
   /* Time step */
   double dt = 0.5;
+  /* To ensure stability, the value of dt should be less than 0.5 * (dx*dx) / D */
 
   /************************************************/
   /* Solution Storage at Current / Next time step */
