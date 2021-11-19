@@ -101,9 +101,9 @@ int main(void) {
   /* Grid spacing */
   double dx = L/(nx-1);
   double invdx2 = 1.0/(dx*dx);      
-  /* Time step */
-  double dt = 0.5;
-  /* To ensure stability, the value of dt should be less than 0.5 * (dx*dx) / D */
+  /* Time step. To ensure stability, the value of dt should be less than 0.5 * (dx*dx) / D 
+     so we take dt to be half this value. (From Live Event 5) */
+  double dt = 0.25 * (dx*dx) / D;
 
   /************************************************/
   /* Solution Storage at Current / Next time step */
