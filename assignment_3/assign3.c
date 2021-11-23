@@ -16,59 +16,39 @@
 *  Line  |     Brief description of a fix
 * Number |
 
-    32         Changed the output of the main function
-               from double to int because the main
-               function must always return an output
-               of type int
+    59 | Added #include <math.h> | sin and cos functions are required so the math module is needed
 
-    51         Don't know what to put here
+    65 | double main(void) --> int main(void) | 'main' function must always return an int
 
-    98         Function sin() was called but it hasn't
-               been defined due to the fact that the
-               math library has not been included. To
-               fix, I have added the line
-               #include <math.h> to the program so sin()
-               is defined.
+    79 | read_input(D, L, nx, t_F); --> read_input(&D, &L, &nx, &t_F); | read_input needs the memory 
+    addresses to store the values so need to add an ampersand
 
-    109        Function cos() was called but it hasn't
-               been defined due to the fact that the
-               math library has not been included. To
-               fix, I have added the line
-               #include <math.h> to the program so cos()
-               is defined.
+    82 | double dx = L/nx; --> double dx = L/(nx-1); | To ensure x reaches the boundary point of 12.566
+    in the for loop
 
-    96-97      Within the if statement, the expressions
-               used = instead of ==. This is an
-               assignment rather than a logical
-               expression so it should not be used in an
-               if statement. Changing each = to a == will
-               fix the issue.
+    84-86 | double dt = 0.5; --> double dt = 0.25 * (dx*dx) / D; | changed value of dt to ensure stability
 
-    110        ctime was declared but it was not given
-               an initial value. Therefore when it was
-               incremented further in the program, it
-               did not have a value to increment. To fix
-               it, I set the value to be 0.0 when
-               the variable is declared.
+    98-105 | VAR = malloc(nx); --> VAR = (double *)malloc(sizeof(double) * nx); | Allocating memory properly since we are storing an nx size array of doubles
 
-    115-122    malloc(nx) --> malloc(sizeof(double) * nx)       
+    108-109 | VAR=NULL --> VAR==NULL | It is a logical statement, not an assignment so == rather than =
 
-    137, 154, 172  for loop changed to interior points [1, nx-1] 
+    117 | double ctime; --> double ctime = 0.0; | Assigning a value for ctime.
 
-    152-153    Changed 2*dt to dt.
+    120 | k <= nx --> k < nx | Looping through an array of size nx goes from 0 to nx-1 not 0 to nx.
 
-    158, 160 175, 177   Changed + D to - D 
+    125-126 | Set un and vn arrays to 0 | Values were not initialised.
 
-    168        Formula was incorrect for rotation matrix
+    131-135 | Added code to print initial values when ctime = 0 | Required in the specification
 
-    182-183    Changed from vts1 and vts2 to vn and vc respectively
+    141-142 | 2*dt --> dt | Step (ii) in the spec requires a timestep of dt not 2*dt
 
+    145, 155, 163 | k = 0; k < nx; --> k = 1; k < nx-1; | Since we access array elements k-1 and k+1 we need to loop through the interior elements missing out the boundary otherwise we will access elements out of bounds
 
-    197-199    Removed the & when freeing memory as it is
-               not required.
+    159 | sfac*uts1[k] --> -sfac*uts1[k] | Formula was incorrect for rotation matrix (Week 6 Slide 7)
 
+    172-175 | Changed copying algorithm to make it more clear | 
 
-    199        Removed free(vts1) and free(vts2)
+    205-208 | free(&VAR) --> free(VAR) | No need for amber-sands when freeing memory
                
 *--------+-------------------------------------------
 * Example (not a real error):
@@ -189,7 +169,7 @@ int main(void) {
     }
 
     /* Copy next values at timestep to u, v arrays. */
-    for (k = 1; k < nx-1; k++) {
+    for (k = 0; k < nx; k++) {
       uc[k] = un[k];
       vc[k] = vn[k];
     }
