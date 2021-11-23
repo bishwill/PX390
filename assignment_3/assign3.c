@@ -26,7 +26,7 @@
     82 | double dx = L/nx; --> double dx = L/(nx-1); | To ensure x reaches the boundary point of 12.566
     in the for loop
 
-    84-86 | double dt = 0.5; --> double dt = 0.25 * (dx*dx) / D; | changed value of dt to ensure stability
+    84-86 | double dt = 0.5; --> double dt = 0.004 | changed value of dt to ensure stability
 
     98-105 | VAR = malloc(nx); --> VAR = (double *)malloc(sizeof(double) * nx); | Allocating memory properly since we are storing an nx size array of doubles
 
@@ -48,8 +48,8 @@
 
     172-175 | Changed copying algorithm to make it more clear | 
 
-    205-208 | free(&VAR) --> free(VAR) | No need for amber-sands when freeing memory
-               
+    185-188 | free(&VAR) --> free(VAR) | No need for amber-sands when freeing memory
+          
 *--------+-------------------------------------------
 * Example (not a real error):
 *  21 ...... Removed space between(void) and {
@@ -81,9 +81,9 @@ int main(void) {
   /* Grid spacing */
   double dx = L/(nx-1);
   double invdx2 = 1.0/(dx*dx);      
-  /* Time step. To ensure stability, the value of dt should be less than 0.5 * (dx*dx) / D 
-     so we take dt to be half this value. (From Live Event 5) */
-  double dt = 0.25 * (dx*dx) / D;
+  /* Setting the timestep. To ensure stability, the value of dt should be less than 0.5 * (dx*dx) / D 
+     so we take dt to be half this value (From Live Event 5). If we choose dt = 0.004 then ctime will hit exactly 1 in the while loop so we use this */
+  double dt = 0.004;
 
   /************************************************/
   /* Solution Storage at Current / Next time step */
@@ -128,7 +128,7 @@ int main(void) {
     vts1[k] = 0; vts2[k] = 0;
   }
 
-  /* Print Initial Values */
+  /* Print initial values */
   for (k = 0; k < nx; k++ ) {
     x = k*dx;
     printf("%g %g %g %g\n",ctime,x,uc[k],vc[k]);
