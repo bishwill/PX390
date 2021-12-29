@@ -112,7 +112,6 @@ int printmat(band_mat *bmat) {
   for(i=0; i<bmat->ncol;i++) {
     for(j=0; j<bmat->nbrows; j++) {
       printf("%ld %ld %g \n",i,j,bmat->array[bmat->nbrows*i + j]);
-      
     }
   }
   return 0;
@@ -124,7 +123,7 @@ int printmat(band_mat *bmat) {
 */
 int main() {
   band_mat bmat;
-  long ncols = 4;
+  long ncols = 1000;
   /* We have a three-point stencil (domain of numerical dependence) of
      our finite-difference equations:
      1 point to the left  -> nbands_low = 1
@@ -140,36 +139,23 @@ int main() {
   /* Loop over the equation number and set the matrix
      values equal to the coefficients of the grid values. 
      Note that boundaries are treated with special cases */
-
   for(i=0; i<ncols; i++) {
-    if(i>0)       {setv(&bmat,i,i-1, 1.0);};
-    setv(               &bmat,i,i,   -2.0);
-    if(i<ncols-1) {setv(&bmat,i,i+1,1.0);};
+    if(i>0)       {setv(&bmat,i,i-1,-1.0);};
+    setv(               &bmat,i,i,   2.0);
+    if(i<ncols-1) {setv(&bmat,i,i+1,-1.0);};
     /* Uniform source term in heat equation */
-    b[i] = 1.0;
+    b[i] = 1.0;   
   }
-
-  printmat(&bmat);
   
-
-  // for (int i = 0; i < 3; i++) {
-  //   for (int j = 0; j < 3; j++) {
-  //     printf("%lf ", getv(&bmat, j, i));
-  //   }
-  //   printf("\n");
-  // }
-
-
   /*  Print coefficient matrix for debugging: */ 
   /*  printmat(&bmat);           */
 
-  // solve_Ax_eq_b(&bmat, x, b);
+  solve_Ax_eq_b(&bmat, x, b);
 
-  // for(i=0; i<ncols; i++) {
-  //   printf("%ld %g %g \n",i,x[i],b[i]);
-  // }
+  for(i=0; i<ncols; i++) {
+    printf("%ld %g %g \n",i,x[i],b[i]);
+  }
 
   finalise_band_mat(&bmat);
-  return(0);
+  retirn(0);
 }
-
