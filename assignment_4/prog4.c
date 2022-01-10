@@ -42,10 +42,11 @@ int main(void) {
   read_input(&L, &N, &D, &v, &kPlus, &kMinus);
   
   double dx = L / N;
-  double alpha = (D / dx*dx) + (v / dx);
-  double beta = (-2*D / dx*dx) - (v / dx) - kPlus;
-  double gamma = D / dx*dx;
-  double delta = (-2*D / dx*dx) - (v / dx) - kMinus;
+  double dx2 = dx*dx;
+  double alpha = (D / dx2) + (v / dx);
+  double beta = (-2*D / dx2) - (v / dx) - kPlus;
+  double gamma = D / dx2;
+  double delta = (-2*D / dx2) - (v / dx) - kMinus;
 
 
   // Coefficients
@@ -98,23 +99,37 @@ int main(void) {
 
   for (long i = 0; i < N; i++) {
     
-    printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i-2, 2*N), 2*N), alpha);
-    printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i-1, 2*N), 2*N), alpha);
+    // printf("%ld %ld %lf\n", 2*i, mod(2*i-2, 2*N), alpha);
+    // printf("%ld %ld %lf\n", 2*i+1, mod(2*i-1, 2*N), alpha);
 
-    printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i, 2*N), 2*N), beta);
+    // printf("%ld %ld %lf\n", 2*i, mod(2*i, 2*N), beta);
 
-    printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i, 2*N), 2*N), kPlus);
+    // printf("%ld %ld %lf\n", 2*i+1, mod(2*i, 2*N), kPlus);
 
-    printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i+1, 2*N), 2*N), kMinus);
+    // printf("%ld %ld %lf\n", 2*i, mod(2*i+1, 2*N), kMinus);
 
-    printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i+2, 2*N), 2*N), gamma);
-    printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i+3, 2*N), 2*N), gamma);
+    // printf("%ld %ld %lf\n", 2*i, mod(2*i+2, 2*N), gamma);
+    // printf("%ld %ld %lf\n", 2*i+1, mod(2*i+3, 2*N), gamma);
 
-    printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i+1, 2*N), 2*N), delta - sigma[i]);
+    // printf("%ld %ld %lf\n", 2*i+1, mod(2*i+1, 2*N), delta - sigma[i]);
 
 
-    // TODO, Mapped Matrix is correct, not quite sure if the banded matrix in python is correct or this one is
-    // re install band_utility.c
+
+
+    // printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i-2, 2*N), 2*N), alpha);
+    // printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i-1, 2*N), 2*N), alpha);
+
+    // printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i, 2*N), 2*N), beta);
+
+    // printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i, 2*N), 2*N), kPlus);
+
+    // printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i+1, 2*N), 2*N), kMinus);
+
+    // printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i+2, 2*N), 2*N), gamma);
+    // printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i+3, 2*N), 2*N), gamma);
+
+    // printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i+1, 2*N), 2*N), delta - sigma[i]);
+
 
     // Setting alpha
     setv(&bmat, fold_mapping(2*i, 2*N), fold_mapping(mod(2*i-2, 2*N), 2*N), alpha);
@@ -138,26 +153,31 @@ int main(void) {
     setv(&bmat, fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i+1, 2*N), 2*N), delta - sigma[i]);
   }
 
+
   // printmat(&bmat);
 
-  // double *mapped_x = (double *) malloc(sizeof(double) * 2 * N);
-  // solve_Ax_eq_b(&bmat, mapped_x, mapped_S);
-
-  // double *x = (double *) malloc(sizeof(double) * 2 * N);
-  // for (long k = 0; k < 2*N; k++) {
-  //   x[fold_mapping_inv(k, 2*N)] = mapped_x[k];
-  // }
-  
+  double *mapped_x = (double *) malloc(sizeof(double) * 2 * N);
+  solve_Ax_eq_b(&bmat, mapped_x, mapped_S);
 
   // for (long k = 0; k < N; k++) {
-  //   printf("(%lf, %lf)\n", k*dx, x[2*k+1]);
+  //   printf("(%lf, %lf)\n", k*dx, mapped_x[2*k]);
   // }
 
+  double *x = (double *) malloc(sizeof(double) * 2 * N);
+  for (long k = 0; k < 2*N; k++) {
+    x[fold_mapping_inv(k, 2*N)] = mapped_x[k];
+  }
+  
 
-  // free(S);
-  // free(mapped_S);
-  // free(x);
-  // free(sigma);
+  for (long k = 0; k < N; k++) {
+    printf("%lf %lf %lf\n", k*dx, x[2*k], x[2*k + 1]);
+  }
+
+
+  free(S);
+  free(mapped_S);
+  free(x);
+  free(sigma);
   finalise_band_mat(&bmat);
   return 0;
 }
