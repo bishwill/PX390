@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <mkl_lapacke.h>
 
+
+// First we define all the functions and structures that we need from band_utlity.c
+
 /* Define structure that holds band matrix information */
 struct band_mat{
   long ncol;        /* Number of columns in band matrix */
@@ -17,233 +20,6 @@ struct band_mat{
 /* Define a new type band_mat */
 typedef struct band_mat band_mat;
 
-int solve_Ax_eq_b(band_mat *bmat, double *x, double *b);
-int printmat(band_mat *bmat);
-long mod(long i, long N);
-void read_input(double *L, long *N, double *D, double *v, double *kPlus, double *kMinus);
-void read_coefficients(double *S, double *sigma, long N);
-int init_band_mat(band_mat *bmat, long nbands_lower, long nbands_upper, long n_columns);
-void finalise_band_mat(band_mat *bmat);
-double *getp(band_mat *bmat, long row, long column);
-double getv(band_mat *bmat, long row, long column);
-double setv(band_mat *bmat, long row, long column, double val);
-long fold_mapping(long i, double N);
-long fold_mapping_inv(long i, double N);
-
-int main(void) {
-
-  // Input values
-  double L;
-  long N;
-  double D;
-  double v;
-  double kPlus;
-  double kMinus;
-  read_input(&L, &N, &D, &v, &kPlus, &kMinus);
-  
-  double dx = L / N;
-  double dx2 = dx*dx;
-  double alpha = (D / dx2) + (v / dx);
-  double beta = (-2*D / dx2) - (v / dx) - kPlus;
-  double gamma = D / dx2;
-  double delta = (-2*D / dx2) - (v / dx) - kMinus;
-
-
-  // Coefficients
-  double *S = (double *) malloc(sizeof(double) * 2 * N);
-  double *sigma = (double *) malloc(sizeof(double) * N);
-  read_coefficients(S, sigma, N);
-  
-  double *mapped_S = (double *) malloc(sizeof(double) * 2 * N);
-  for (long k = 0; k < N; k++) {
-    mapped_S[fold_mapping(k, 2*N)] = S[k];
-  }
-  
-
-  // // Printing out values
-  // printf("Input Values:\n");
-  // printf("L = %lf\n", L);
-  // printf("N = %ld\n", N);
-  // printf("D = %lf\n", D);
-  // printf("v = %lf\n", v);
-  // printf("kPlus = %lf\n", kPlus);
-  // printf("kMinus = %lf\n", kMinus);
-  // printf("dx = %lf\n", dx);
-
-  // printf("alpha = %lf\n", alpha);
-  // printf("beta = %lf\n", beta);
-  // printf("gamma = %lf\n", gamma);
-  // printf("delta = %lf\n", delta);
-
-  // printf("\n");
-
-  // printf("Coefficients:\n");
-  // for (int i = 0; i < 2*N; i++) {
-  //   printf("S_%d = %lf\n", i, S[i]);
-  // }
-  // for (int i = 0; i < N; i++) {
-  //   printf("sigma_%d = %lf\n", i, sigma[i]);
-  // }
-
-
-  
-
-  band_mat bmat;
-  // With this implementation we get 4 upper bands and 4 lower bands
-  long nbands_low = 4;
-  long nbands_up  = 4;
-  
-  init_band_mat(&bmat, nbands_low, nbands_up, 2*N);
-
-  
-
-  for (long i = 0; i < N; i++) {
-    
-    // printf("%ld %ld %lf\n", 2*i, mod(2*i-2, 2*N), alpha);
-    // printf("%ld %ld %lf\n", 2*i+1, mod(2*i-1, 2*N), alpha);
-
-    // printf("%ld %ld %lf\n", 2*i, mod(2*i, 2*N), beta);
-
-    // printf("%ld %ld %lf\n", 2*i+1, mod(2*i, 2*N), kPlus);
-
-    // printf("%ld %ld %lf\n", 2*i, mod(2*i+1, 2*N), kMinus);
-
-    // printf("%ld %ld %lf\n", 2*i, mod(2*i+2, 2*N), gamma);
-    // printf("%ld %ld %lf\n", 2*i+1, mod(2*i+3, 2*N), gamma);
-
-    // printf("%ld %ld %lf\n", 2*i+1, mod(2*i+1, 2*N), delta - sigma[i]);
-
-
-
-
-    // printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i-2, 2*N), 2*N), alpha);
-    // printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i-1, 2*N), 2*N), alpha);
-
-    // printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i, 2*N), 2*N), beta);
-
-    // printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i, 2*N), 2*N), kPlus);
-
-    // printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i+1, 2*N), 2*N), kMinus);
-
-    // printf("%ld %ld %lf\n", fold_mapping(2*i, 2*N), fold_mapping(mod(2*i+2, 2*N), 2*N), gamma);
-    // printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i+3, 2*N), 2*N), gamma);
-
-    // printf("%ld %ld %lf\n", fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i+1, 2*N), 2*N), delta - sigma[i]);
-
-
-    // Setting alpha
-    setv(&bmat, fold_mapping(2*i, 2*N), fold_mapping(mod(2*i-2, 2*N), 2*N), alpha);
-    setv(&bmat, fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i-1, 2*N), 2*N), alpha);
-    
-    // Setting beta
-    setv(&bmat, fold_mapping(2*i, 2*N), fold_mapping(mod(2*i, 2*N), 2*N), beta);
-    
-
-    // Setting kPlus
-    setv(&bmat, fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i, 2*N), 2*N), kPlus);
-
-    // Setting kMinus
-    setv(&bmat, fold_mapping(2*i, 2*N), fold_mapping(mod(2*i+1, 2*N), 2*N), kMinus);
-    
-    // Setting gamma
-    setv(&bmat, fold_mapping(2*i, 2*N), fold_mapping(mod(2*i+2, 2*N), 2*N), gamma);
-    setv(&bmat, fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i+3, 2*N), 2*N), gamma);
-
-    // Setting delta
-    setv(&bmat, fold_mapping(2*i+1, 2*N), fold_mapping(mod(2*i+1, 2*N), 2*N), delta - sigma[i]);
-  }
-
-
-  // printmat(&bmat);
-
-  double *mapped_x = (double *) malloc(sizeof(double) * 2 * N);
-  solve_Ax_eq_b(&bmat, mapped_x, mapped_S);
-
-  // for (long k = 0; k < N; k++) {
-  //   printf("(%lf, %lf)\n", k*dx, mapped_x[2*k]);
-  // }
-
-  double *x = (double *) malloc(sizeof(double) * 2 * N);
-  for (long k = 0; k < 2*N; k++) {
-    x[fold_mapping_inv(k, 2*N)] = mapped_x[k];
-  }
-  
-
-  for (long k = 0; k < N; k++) {
-    printf("%lf %lf %lf\n", k*dx, x[2*k], x[2*k + 1]);
-  }
-
-
-  free(S);
-  free(mapped_S);
-  free(x);
-  free(sigma);
-  finalise_band_mat(&bmat);
-  return 0;
-}
-
-/* Solve the equation Ax = b for a matrix a stored in band format
-   and x and b real arrays                                          */
-int solve_Ax_eq_b(band_mat *bmat, double *x, double *b) {
-  /* Copy bmat array into the temporary store */
-  int i,bandno;
-  for(i=0;i<bmat->ncol;i++) { 
-    for (bandno=0;bandno<bmat->nbrows;bandno++) {
-      bmat->array_inv[bmat->nbrows_inv*i+(bandno+bmat->nbands_low)] = bmat->array[bmat->nbrows*i+bandno];
-    }
-    x[i] = b[i];
-  }
-
-  long nrhs = 1;
-  long ldab = bmat->nbands_low*2 + bmat->nbands_up + 1;
-  int info = LAPACKE_dgbsv( LAPACK_COL_MAJOR, bmat->ncol, bmat->nbands_low, bmat->nbands_up, nrhs, bmat->array_inv, ldab, bmat->ipiv, x, bmat->ncol);
-  return info;
-}
-
-int printmat(band_mat *bmat) {
-  long i,j;
-  for(i=0; i<bmat->ncol;i++) {
-    for(j=0; j<bmat->nbrows; j++) {
-      printf("%ld %ld %g \n",i,j,bmat->array[bmat->nbrows*i + j]);
-      
-    }
-  }
-  return 0;
-}
-
-long mod(long i, long N) {
-  return (i % N + N) % N;
-}
-
-void read_input(double *L, long *N, double *D, double *v, double *kPlus, double *kMinus) {
-  FILE *infile;
-  if(!(infile=fopen("input.txt","r"))) {
-    printf("Error opening file\n");
-    exit(1);
-  }
-  if(6 != fscanf(infile, "%lf %ld %lf %lf %lf %lf", L, N, D, v, kPlus, kMinus)) {
-    printf("Error reading parameters from file\n");
-    exit(1);
-  }
-  fclose(infile);
-}
-
-void read_coefficients(double *S, double *sigma, long N) {
-  FILE *coeff_file;
-  if(!(coeff_file=fopen("coefficients.txt","r"))) {
-    printf("Error opening file\n");
-    exit(1);
-  }
-  for(long j = 0; j < N; j++) {
-    if (2 != fscanf(coeff_file, "%lf %lf", &S[2*j], &sigma[j])) {
-      printf("Error reading coefficients from file\n");
-      exit(1);
-    }
-    S[2*j] = -S[2*j];
-    S[2*j+1] = 0;
-  }
-  fclose(coeff_file);
-}
 
 /* Initialise a band matrix of a certain size, allocate memory,
    and set the parameters.  */ 
@@ -299,6 +75,67 @@ double setv(band_mat *bmat, long row, long column, double val) {
   return val;
 }
 
+/* Solve the equation Ax = b for a matrix a stored in band format
+   and x and b real arrays                                          */
+int solve_Ax_eq_b(band_mat *bmat, double *x, double *b) {
+  /* Copy bmat array into the temporary store */
+  int i,bandno;
+  for(i=0;i<bmat->ncol;i++) { 
+    for (bandno=0;bandno<bmat->nbrows;bandno++) {
+      bmat->array_inv[bmat->nbrows_inv*i+(bandno+bmat->nbands_low)] = bmat->array[bmat->nbrows*i+bandno];
+    }
+    x[i] = b[i];
+  }
+
+  long nrhs = 1;
+  long ldab = bmat->nbands_low*2 + bmat->nbands_up + 1;
+  int info = LAPACKE_dgbsv( LAPACK_COL_MAJOR, bmat->ncol, bmat->nbands_low, bmat->nbands_up, nrhs, bmat->array_inv, ldab, bmat->ipiv, x, bmat->ncol);
+  return info;
+}
+
+
+// Next we have functions to read the inputs and coefficients into arrays.
+
+// Reads the parameters into the program from input.txt
+void read_input(double *L, long *N, double *D, double *v, double *kPlus, double *kMinus) {
+  FILE *infile;
+  if(!(infile=fopen("input.txt","r"))) {
+    printf("Error opening file\n");
+    exit(1);
+  }
+  if(6 != fscanf(infile, "%lf %ld %lf %lf %lf %lf", L, N, D, v, kPlus, kMinus)) {
+    printf("Error reading parameters from file\n");
+    exit(1);
+  }
+  fclose(infile);
+}
+
+// Reads the coefficients into the program from coefficients.txt
+void read_coefficients(double *S, double *sigma, long N) {
+  FILE *coeff_file;
+  if(!(coeff_file=fopen("coefficients.txt","r"))) {
+    printf("Error opening file\n");
+    exit(1);
+  }
+  for(long j = 0; j < N; j++) {
+    if (2 != fscanf(coeff_file, "%lf %lf", &S[2*j], &sigma[j])) {
+      printf("Error reading coefficients from file\n");
+      exit(1);
+    }
+    S[2*j] = -S[2*j];
+    S[2*j+1] = 0;
+  }
+  fclose(coeff_file);
+}
+
+// This function will return the result of i mod N. This is needed for indexing when assigning values to the matrix.
+// For example, for an array of length 10: mod(1, 10) = 1, mod(10, 10) = 0, mod(11, 10) = 1, mod(-1, 10) = 9
+long mod(long i, long N) {
+  return (i % N + N) % N;
+}
+
+// This function applies the matrix folding operation to an index i from an array of length N.
+// This folding operation is described in Week 6 Lectures.
 long fold_mapping(long i, double N) {
   if (i < N/2) {
     return 2 * i;
@@ -308,12 +145,106 @@ long fold_mapping(long i, double N) {
   }
 }
 
-long fold_mapping_inv(long i, double N) {
-  if (i % 2 == 0) {
-    return i/2;
-  }
-  else {
-    return (-i - 1 + 2*N) / 2;
-  }
-}
+// Solution starts here
+int main(void) {
 
+  // Reading in input variables
+  double L;
+  long N;
+  double D;
+  double v;
+  double kPlus;
+  double kMinus;
+  read_input(&L, &N, &D, &v, &kPlus, &kMinus);
+  
+  // Calculating the values required for the banded matrix
+  long K = 2*N;
+  double dx = L / N;
+  double dx2 = dx*dx;
+  double alpha = (D / dx2) + (v / dx);
+  double beta = (-2*D / dx2) - (v / dx) - kPlus;
+  double gamma = D / dx2;
+  double delta = (-2*D / dx2) - (v / dx) - kMinus;
+
+
+  // Reading coefficients into arrays. Note that S has been re-formulated to be length 2N.
+  // Since it contains the values of S and zeros corresponding to the 2 equations.
+  double *S = (double *) malloc(sizeof(double) * 2 * N);
+  double *sigma = (double *) malloc(sizeof(double) * N);
+  read_coefficients(S, sigma, N);
+  
+  // Applying the matrix fold mapping to S since the matrix is not narrow banded.
+  double *mapped_S = (double *) malloc(sizeof(double) * 2 * N);
+  for (long k = 0; k < N; k++) {
+    mapped_S[fold_mapping(k, K)] = S[k];
+  }
+  
+
+  // Initialising the band matrix
+  // With this implementation we get 4 upper bands and 4 lower bands
+  band_mat bmat;
+  long nbands_low = 4;
+  long nbands_up  = 4;
+  init_band_mat(&bmat, nbands_low, nbands_up, K);
+
+  
+  // Setting the banded matrix using setv() from band_utility.c
+  // The first step is to take the index i modulo K which will handle indices that are out of bounds.
+  // Then I apply the fold_mapping function to turn the matrix into narrow banded form.
+  // Then use this index in the setv() function to create the banded matrix.
+  for (long i = 0; i < N; i++) {
+    // Setting alpha
+    setv(&bmat, fold_mapping(2*i, K), fold_mapping(mod(2*i-2, K), K), alpha);
+    setv(&bmat, fold_mapping(2*i+1, K), fold_mapping(mod(2*i-1, K), K), alpha);
+    
+    // Setting beta
+    setv(&bmat, fold_mapping(2*i, K), fold_mapping(2*i, K), beta);
+    
+
+    // Setting kPlus
+    setv(&bmat, fold_mapping(2*i+1, K), fold_mapping(2*i, K), kPlus);
+
+    // Setting kMinus
+    setv(&bmat, fold_mapping(2*i, K), fold_mapping(2*i+1, K), kMinus);
+    
+    // Setting gamma
+    setv(&bmat, fold_mapping(2*i, K), fold_mapping(mod(2*i+2, K), K), gamma);
+    setv(&bmat, fold_mapping(2*i+1, K), fold_mapping(mod(2*i+3, K), K), gamma);
+
+    // Setting delta
+    setv(&bmat, fold_mapping(2*i+1, K), fold_mapping(2*i+1, K), delta - sigma[i]);
+  }
+
+  // Creating an array with the output values and solving the system.
+  double *mapped_x = (double *) malloc(sizeof(double) * 2 * N);
+  solve_Ax_eq_b(&bmat, mapped_x, mapped_S);
+
+
+  // Applying the inverse mapping to get the output values in the correct order.
+  double *x = (double *) malloc(sizeof(double) * 2 * N);
+  for (long k = 0; k < K; k++) {
+    x[k] = mapped_x[fold_mapping(k, K)];
+  }
+
+  // Writing x, A(x) and B(x) to output.txt
+  FILE *output_file;
+  output_file = fopen("output.txt","w");
+  if(output_file == NULL) {
+    printf("Error writing to file\n");
+    exit(1);
+  }
+  for (long k = 0; k < N; k++) {
+    fprintf(output_file, "%lf %lf %lf\n", k*dx, x[2*k], x[2*k + 1]);
+  }
+  fclose(output_file);
+
+  
+  // Freeing up used memory
+  free(S);
+  free(mapped_S);
+  free(x);
+  free(mapped_x);
+  free(sigma);
+  finalise_band_mat(&bmat);
+  return 0;
+}
